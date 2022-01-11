@@ -1,2 +1,2 @@
 # GrandTask
-This Repository contains taks of Grand Company
+This Repository contains task of Grand Company
