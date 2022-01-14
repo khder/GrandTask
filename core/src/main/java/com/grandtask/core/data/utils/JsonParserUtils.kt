@@ -1,6 +1,6 @@
 package com.grandtask.core.data.utils
 
-import com.grandtask.core.data.models.Article
+import com.grandtask.utils.Article
 import org.json.JSONArray
 import org.json.JSONObject
 

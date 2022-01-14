@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/redditNewsFragment">
+
+    <fragment
+        android:id="@+id/redditNewsFragment"
+        android:name="com.grandtask.feature_reddit_news.RedditNewsFragment"
+        android:label="RedditNewsFragment" >
+        <action
+            android:id="@+id/action_redditNewsFragment_to_redditNewsDetailsFragment"
+            app:destination="@id/redditNewsDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/redditNewsDetailsFragment"
+        android:name="com.grandtask.feature_reddit_news_details.RedditNewsDetailsFragment"
+        android:label="RedditNewsDetailsFragment" />
+</navigation>

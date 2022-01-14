@@ -1,59 +1,100 @@
 package com.grandtask.feature_reddit_news
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
+import android.widget.Toast
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.grandtask.core.di.ObjectsProvider
+import com.grandtask.feature_reddit_news.databinding.FragmentRedditNewsBinding
+import com.grandtask.utils.Article
+import com.grandtask.utils.RedditNewsInteractions
+import com.grandtask.utils.Status
+
 /**
  * A fragment representing a list of Items.
  */
 class RedditNewsFragment : Fragment() {
 
-    private var columnCount = 1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
-    }
+    private lateinit var viewModel: RedditNewsViewModel
+    private var binding: FragmentRedditNewsBinding?=null
+    private lateinit var redditNewsInteractions: RedditNewsInteractions
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_reddit_news, container, false)
-
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = MyRedditNewsRecyclerViewAdapter()
-            }
-        }
-        return view
+    ): View {
+        binding = FragmentRedditNewsBinding.inflate(inflater,container,false)
+        return binding!!.root
     }
 
-    companion object {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity:Activity = context as Activity
+        redditNewsInteractions = activity as RedditNewsInteractions
+    }
 
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupUI()
+        setupViewModel()
+        setupObservers()
+    }
+    private fun setupUI() {
+        binding!!.list.addItemDecoration(
+            DividerItemDecoration(
+                binding!!.list.context,
+                (binding!!.list.layoutManager as LinearLayoutManager).orientation
+            )
+        )
+    }
+    private fun setupViewModel(){
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(ObjectsProvider.getUseCaseObject())
+        ).get(RedditNewsViewModel::class.java)
+    }
 
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-            RedditNewsFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
+    private fun setupObservers(){
+        viewModel.getArticles().observe(viewLifecycleOwner,{
+            it?.let {
+                resource ->
+                when(resource.status){
+                    Status.SUCCESS -> {
+                        binding!!.list.visibility = View.VISIBLE
+                        binding!!.progressCircular.visibility = View.GONE
+                        binding!!.list.adapter = MyRedditNewsRecyclerViewAdapter(resource.data!!,
+                        ::onClick)
+                    }
+                    Status.ERROR -> {
+                        binding!!.list.visibility = View.VISIBLE
+                        binding!!.progressCircular.visibility = View.GONE
+                        Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+                    }
+                    Status.LOADING -> {
+                        binding!!.progressCircular.visibility = View.VISIBLE
+                        binding!!.list.visibility = View.GONE
+                    }
                 }
             }
+        })
+    }
+
+    private fun onClick(article: Article){
+        redditNewsInteractions.
+            openRedditNewsDetails(article)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 }

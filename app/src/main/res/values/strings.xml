@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Grand Task</string>
     <string name="title_dynamicfeature">Module Title</string>
+    <string name="kotlin_news_title">Kotlin News</string>
 </resources>
