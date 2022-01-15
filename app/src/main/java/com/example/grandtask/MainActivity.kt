@@ -47,7 +47,10 @@ class MainActivity : AppCompatActivity(),RedditNewsInteractions {
     }
 
     override fun onBackPressed() {
-       navigateBack()
-
+       if(binding!!.backArrowImage.visibility == View.VISIBLE) {
+           navigateBack()
+       }else{
+           finish()
+       }
     }
 }
