@@ -8,9 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.grandtask.core.di.ObjectsProvider
@@ -59,7 +57,7 @@ class RedditNewsFragment : Fragment() {
     private fun setupViewModel(){
         viewModel = ViewModelProvider(
             this,
-            ViewModelFactory(ObjectsProvider.getUseCaseObject())
+            ViewModelFactory(ObjectsProvider.getUseCaseObject(requireContext().applicationContext))
         ).get(RedditNewsViewModel::class.java)
     }
 
